@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Center of Excellence - Implementation Wizard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #e0e0e0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #667eea;
+            transition: width 0.3s ease;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step h2 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .step-subtitle {
+            color: #718096;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .question-group {
+            margin-bottom: 30px;
+        }
+
+        .question-label {
+            display: block;
+            color: #2d3748;
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .question-help {
+            display: block;
+            color: #718096;
+            font-size: 13px;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .radio-group,
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .radio-option,
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .radio-option:hover,
+        .checkbox-option:hover {
+            border-color: #667eea;
+            background: #f7fafc;
+        }
+
+        .radio-option input,
+        .checkbox-option input {
+            margin-right: 10px;
+            width: auto;
+        }
+
+        .radio-option.selected,
+        .checkbox-option.selected {
+            border-color: #667eea;
+            background: #eef2ff;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            gap: 15px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn-primary:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .recommendation-card {
+            background: #f7fafc;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+        }
+
+        .recommendation-card h3 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .recommendation-card p {
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .recommendation-card ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .recommendation-card li {
+            color: #4a5568;
+            margin-bottom: 6px;
+            line-height: 1.5;
+        }
+
+        .alert {
+            background: #fff5f5;
+            border-left: 4px solid #f56565;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+        }
+
+        .alert.info {
+            background: #ebf8ff;
+            border-left-color: #4299e1;
+        }
+
+        .alert.success {
+            background: #f0fff4;
+            border-left-color: #48bb78;
+        }
+
+        .alert p {
+            color: #2d3748;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .summary-section {
+            margin-bottom: 30px;
+        }
+
+        .summary-section h3 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -24px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #667eea;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #667eea;
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: -19px;
+            top: 17px;
+            width: 2px;
+            height: calc(100% - 12px);
+            background: #e2e8f0;
+        }
+
+        .timeline-item:last-child::after {
+            display: none;
+        }
+
+        .timeline-item h4 {
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .timeline-item p {
+            color: #718096;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .download-btn {
+            background: #48bb78;
+            color: white;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .download-btn:hover {
+            background: #38a169;
+        }
+
+        .score-indicator {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .score-high {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .score-medium {
+            background: #feebc8;
+            color: #744210;
+        }
+
+        .score-low {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .slider-container {
+            margin-top: 10px;
+        }
+
+        .slider-value {
+            display: inline-block;
+            font-weight: 600;
+            color: #667eea;
+            margin-left: 10px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 AI Center of Excellence</h1>
+            <p>Implementation Wizard for Leadership Teams</p>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+
+        <div class="content">
+            <!-- Step 1: Welcome -->
+            <div class="step active" data-step="1">
+                <h2>Welcome to Your AI CoE Journey</h2>
+                <p class="step-subtitle">This wizard will help you build the right AI governance structure for your organization</p>
+                
+                <div class="alert info">
+                    <p><strong>What you'll accomplish:</strong></p>
+                    <p>✓ Assess your current AI maturity and challenges<br>
+                    ✓ Determine which roles you need (Strategist, Enabler, or Combined)<br>
+                    ✓ Decide between internal promotion vs. external hiring<br>
+                    ✓ Get a customized implementation roadmap<br>
+                    ✓ Download your complete action plan</p>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">Let's start with your name and company</label>
+                    <input type="text" id="userName" placeholder="Your name">
+                    <input type="text" id="companyName" placeholder="Company name" style="margin-top: 10px;">
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-secondary" disabled>← Previous</button>
+                    <button class="btn-primary" onclick="nextStep()">Get Started →</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Current State Assessment -->
+            <div class="step" data-step="2">
+                <h2>Current State Assessment</h2>
+                <p class="step-subtitle">Help us understand where you are today</p>
+
+                <div class="question-group">
+                    <label class="question-label">How many employees in your organization?</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="companySize" value="small">
+                            <span><strong>1-50 employees</strong> - Small/Startup</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="companySize" value="medium">
+                            <span><strong>51-500 employees</strong> - Mid-size</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="companySize" value="large">
+                            <span><strong>500+ employees</strong> - Enterprise</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">How many people are currently experimenting with AI?</label>
+                    <span class="question-help">Include anyone using ChatGPT, Claude, custom AI tools, etc.</span>
+                    <input type="number" id="aiUsers" placeholder="Number of people" min="0">
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">Current AI maturity level</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="maturityLevel" value="exploring">
+                            <span><strong>Exploring</strong> - Individual experiments, no coordination</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="maturityLevel" value="piloting">
+                            <span><strong>Piloting</strong> - A few projects, some informal sharing</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="maturityLevel" value="scaling">
+                            <span><strong>Scaling</strong> - Multiple projects, need better governance</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="maturityLevel" value="mature">
+                            <span><strong>Mature</strong> - Formal processes exist, looking to optimize</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="previousStep()">← Previous</button>
+                    <button class="btn-primary" onclick="nextStep()">Continue →</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Pain Points -->
+            <div class="step" data-step="3">
+                <h2>Identify Your Pain Points</h2>
+                <p class="step-subtitle">Select all the challenges you're currently experiencing</p>
+
+                <div class="question-group">
+                    <label class="question-label">What problems are you trying to solve?</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="painPoints" value="duplication">
+                            <span><strong>Duplication of effort</strong> - Multiple teams building similar solutions</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="painPoints" value="knowledge">
+                            <span><strong>Knowledge silos</strong> - Learnings not shared across teams</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="painPoints" value="standards">
+                            <span><strong>No standards</strong> - Everyone using different tools and approaches</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="painPoints" value="onboarding">
+                            <span><strong>Onboarding challenges</strong> - New people have no idea where to start</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="painPoints" value="visibility">
+                            <span><strong>Lack of visibility</strong> - Leadership doesn't know what's happening</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="painPoints" value="roi">
+                            <span><strong>Can't prove ROI</strong> - Hard to measure AI impact on business</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="painPoints" value="security">
+                            <span><strong>Security/compliance risks</strong> - No governance over AI usage</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="painPoints" value="scaling">
+                            <span><strong>Can't scale pilots</strong> - Stuck in "pilot purgatory"</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="previousStep()">← Previous</button>
+                    <button class="btn-primary" onclick="nextStep()">Continue →</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Resources & Timeline -->
+            <div class="step" data-step="4">
+                <h2>Resources & Timeline</h2>
+                <p class="step-subtitle">Let's understand your constraints and urgency</p>
+
+                <div class="question-group">
+                    <label class="question-label">What's your budget range for this initiative?</label>
+                    <span class="question-help">Include salary, tools, and initial setup costs</span>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="budget" value="under100k">
+                            <span><strong>Under $100K</strong> - Limited budget</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="budget" value="100-250k">
+                            <span><strong>$100K - $250K</strong> - Moderate budget</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="budget" value="250-500k">
+                            <span><strong>$250K - $500K</strong> - Substantial budget</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="budget" value="over500k">
+                            <span><strong>Over $500K</strong> - Enterprise budget</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">Timeline to have someone in place?</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="timeline" value="immediate">
+                            <span><strong>Immediate (1-2 months)</strong> - This is urgent</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="timeline" value="quarter">
+                            <span><strong>This quarter (3-4 months)</strong> - Important but planned</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="timeline" value="half">
+                            <span><strong>Next 6 months</strong> - Strategic initiative</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">Do you have someone internal who could take this on?</label>
+                    <span class="question-help">Someone technical with cross-team visibility and credibility</span>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="internalCandidate" value="yes">
+                            <span><strong>Yes</strong> - We have someone in mind</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="internalCandidate" value="maybe">
+                            <span><strong>Maybe</strong> - A few possibilities</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="internalCandidate" value="no">
+                            <span><strong>No</strong> - Would need to hire externally</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="previousStep()">← Previous</button>
+                    <button class="btn-primary" onclick="nextStep()">Continue →</button>
+                </div>
+            </div>
+
+            <!-- Step 5: Leadership Support -->
+            <div class="step" data-step="5">
+                <h2>Leadership & Culture</h2>
+                <p class="step-subtitle">Understanding executive buy-in and organizational readiness</p>
+
+                <div class="question-group">
+                    <label class="question-label">Executive sponsorship level</label>
+                    <span class="question-help">Rate from 1-10: How committed is your executive team?</span>
+                    <div class="slider-container">
+                        <input type="range" id="executiveSupport" min="1" max="10" value="5">
+                        <span class="slider-value" id="executiveSupportValue">5/10</span>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">Current collaboration level between departments</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="collaboration" value="siloed">
+                            <span><strong>Siloed</strong> - Teams rarely work together</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="collaboration" value="occasional">
+                            <span><strong>Occasional</strong> - Some cross-functional work</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="collaboration" value="regular">
+                            <span><strong>Regular</strong> - Good cross-team communication</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="collaboration" value="integrated">
+                            <span><strong>Highly Integrated</strong> - Strong collaborative culture</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">Biggest cultural challenge?</label>
+                    <textarea id="culturalChallenge" placeholder="Describe any organizational barriers to AI adoption..."></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="previousStep()">← Previous</button>
+                    <button class="btn-primary" onclick="generateRecommendations()">Get My Recommendations →</button>
+                </div>
+            </div>
+
+            <!-- Step 6: Recommendations -->
+            <div class="step" data-step="6">
+                <h2>Your Custom AI CoE Recommendations</h2>
+                <p class="step-subtitle">Based on your responses, here's what we recommend</p>
+
+                <div id="recommendationsContainer"></div>
+
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="previousStep()">← Previous</button>
+                    <button class="btn-primary" onclick="nextStep()">View Action Plan →</button>
+                </div>
+            </div>
+
+            <!-- Step 7: Action Plan -->
+            <div class="step" data-step="7">
+                <h2>Your Implementation Action Plan</h2>
+                <p class="step-subtitle">Here's your roadmap to success</p>
+
+                <div id="actionPlanContainer"></div>
+
+                <button class="btn-primary download-btn" onclick="downloadPlan()">📥 Download Complete Action Plan</button>
+
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="previousStep()">← Previous</button>
+                    <button class="btn-primary" onclick="restartWizard()">Start Over</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State management
+        let currentStep = 1;
+        const totalSteps = 7;
+        const formData = {};
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgress();
+            attachEventListeners();
+        });
+
+        function attachEventListeners() {
+            // Radio button styling
+            document.querySelectorAll('.radio-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const radio = this.querySelector('input[type="radio"]');
+                    radio.checked = true;
+                    
+                    const group = radio.name;
+                    document.querySelectorAll(`input[name="${group}"]`).forEach(r => {
+                        r.closest('.radio-option').classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                });
+            });
+
+            // Checkbox styling
+            document.querySelectorAll('.checkbox-option').forEach(option => {
+                option.addEventListener('click', function(e) {
+                    if (e.target.type !== 'checkbox') {
+                        const checkbox = this.querySelector('input[type="checkbox"]');
+                        checkbox.checked = !checkbox.checked;
+                    }
+                    this.classList.toggle('selected');
+                });
+            });
+
+            // Slider value display
+            const slider = document.getElementById('executiveSupport');
+            if (slider) {
+                slider.addEventListener('input', function() {
+                    document.getElementById('executiveSupportValue').textContent = this.value + '/10';
+                });
+            }
+        }
+
+        function nextStep() {
+            if (!validateStep(currentStep)) return;
+            
+            saveStepData(currentStep);
+            currentStep++;
+            showStep(currentStep);
+            updateProgress();
+            window.scrollTo(0, 0);
+        }
+
+        function previousStep() {
+            currentStep--;
+            showStep(currentStep);
+            updateProgress();
+            window.scrollTo(0, 0);
+        }
+
+        function showStep(step) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.querySelector(`.step[data-step="${step}"]`).classList.add('active');
+        }
+
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function validateStep(step) {
+            // Basic validation for required fields
+            if (step === 1) {
+                const name = document.getElementById('userName').value;
+                const company = document.getElementById('companyName').value;
+                if (!name || !company) {
+                    alert('Please enter your name and company name');
+                    return false;
+                }
+            }
+            
+            if (step === 2) {
+                const companySize = document.querySelector('input[name="companySize"]:checked');
+                const maturity = document.querySelector('input[name="maturityLevel"]:checked');
+                const aiUsers = document.getElementById('aiUsers').value;
+                
+                if (!companySize || !maturity || !aiUsers) {
+                    alert('Please complete all fields');
+                    return false;
+                }
+            }
+            
+            if (step === 4) {
+                const budget = document.querySelector('input[name="budget"]:checked');
+                const timeline = document.querySelector('input[name="timeline"]:checked');
+                const internal = document.querySelector('input[name="internalCandidate"]:checked');
+                
+                if (!budget || !timeline || !internal) {
+                    alert('Please answer all questions');
+                    return false;
+                }
+            }
+            
+            if (step === 5) {
+                const collaboration = document.querySelector('input[name="collaboration"]:checked');
+                if (!collaboration) {
+                    alert('Please answer all questions');
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
+        function saveStepData(step) {
+            if (step === 1) {
+                formData.userName = document.getElementById('userName').value;
+                formData.companyName = document.getElementById('companyName').value;
+            }
+            
+            if (step === 2) {
+                formData.companySize = document.querySelector('input[name="companySize"]:checked').value;
+                formData.aiUsers = document.getElementById('aiUsers').value;
+                formData.maturityLevel = document.querySelector('input[name="maturityLevel"]:checked').value;
+            }
+            
+            if (step === 3) {
+                formData.painPoints = Array.from(document.querySelectorAll('input[name="painPoints"]:checked'))
+                    .map(cb => cb.value);
+            }
+            
+            if (step === 4) {
+                formData.budget = document.querySelector('input[name="budget"]:checked').value;
+                formData.timeline = document.querySelector('input[name="timeline"]:checked').value;
+                formData.internalCandidate = document.querySelector('input[name="internalCandidate"]:checked').value;
+            }
+            
+            if (step === 5) {
+                formData.executiveSupport = document.getElementById('executiveSupport').value;
+                formData.collaboration = document.querySelector('input[name="collaboration"]:checked').value;
+                formData.culturalChallenge = document.getElementById('culturalChallenge').value;
+            }
+        }
+
+        function generateRecommendations() {
+            if (!validateStep(5)) return;
+            saveStepData(5);
+            
+            const recommendations = analyzeAndRecommend();
+            displayRecommendations(recommendations);
+            
+            nextStep();
+        }
+
+        function analyzeAndRecommend() {
+            const rec = {
+                roleStructure: '',
+                hiringStrategy: '',
+                urgencyLevel: '',
+                budgetFit: '',
+                keyPriorities: [],
+                warnings: [],
+                quickWins: []
+            };
+
+            // Determine role structure
+            if (formData.companySize === 'small' || formData.budget === 'under100k') {
+                rec.roleStructure = 'combined';
+            } else if (formData.companySize === 'large' && formData.budget !== 'under100k') {
+                rec.roleStructure = 'split';
+            } else {
+                rec.roleStructure = 'phased';
+            }
+
+            // Hiring strategy
+            if (formData.internalCandidate === 'yes' && formData.timeline === 'immediate') {
+                rec.hiringStrategy = 'internal';
+            } else if (formData.internalCandidate === 'no') {
+                rec.hiringStrategy = 'external';
+            } else {
+                rec.hiringStrategy = 'hybrid';
+            }
+
+            // Urgency assessment
+            const painPointCount = formData.painPoints.length;
+            if (painPointCount >= 5 || formData.timeline === 'immediate') {
+                rec.urgencyLevel = 'high';
+            } else if (painPointCount >= 3) {
+                rec.urgencyLevel = 'medium';
+            } else {
+                rec.urgencyLevel = 'low';
+            }
+
+            // Budget fit analysis
+            const budgetScore = {
+                'under100k': 1,
+                '100-250k': 2,
+                '250-500k': 3,
+                'over500k': 4
+            }[formData.budget];
+
+            const needScore = formData.companySize === 'large' ? 3 : 
+                            formData.companySize === 'medium' ? 2 : 1;
+
+            rec.budgetFit = budgetScore >= needScore ? 'good' : 'constrained';
+
+            // Key priorities based on pain points
+            const priorityMap = {
+                duplication: 'Establish use case registry and approval process',
+                knowledge: 'Create shared knowledge base and weekly office hours',
+                standards: 'Define tool standards and governance framework',
+                onboarding: 'Build AI onboarding program for new hires',
+                visibility: 'Implement project tracking dashboard for leadership',
+                roi: 'Create measurement framework and KPI tracking',
+                security: 'Establish AI governance and compliance protocols',
+                scaling: 'Build pilot-to-production playbook'
+            };
+
+            formData.painPoints.forEach(pain => {
+                if (priorityMap[pain]) {
+                    rec.keyPriorities.push(priorityMap[pain]);
+                }
+            });
+
+            // Warnings
+            if (formData.executiveSupport < 5) {
+                rec.warnings.push('Low executive support may hinder success - secure C-level sponsorship first');
+            }
+            if (formData.collaboration === 'siloed') {
+                rec.warnings.push('Siloed culture will be a major challenge - focus on building relationships first');
+            }
+            if (rec.budgetFit === 'constrained') {
+                rec.warnings.push('Budget may be tight for your company size - consider phased approach');
+            }
+
+            // Quick wins
+            if (formData.painPoints.includes('knowledge')) {
+                rec.quickWins.push('Start weekly AI show-and-tell sessions (no cost)');
+            }
+            if (formData.painPoints.includes('onboarding')) {
+                rec.quickWins.push('Create a simple AI tools wiki in Notion/Confluence');
+            }
+            if (formData.painPoints.includes('duplication')) {
+                rec.quickWins.push('Audit current AI projects and create visibility map');
+            }
+
+            return rec;
+        }
+
+        function displayRecommendations(rec) {
+            const container = document.getElementById('recommendationsContainer');
+            let html = '';
+
+            // Role Structure Recommendation
+            html += '<div class="recommendation-card">';
+            html += '<h3>Recommended Role Structure</h3>';
+            
+            if (rec.roleStructure === 'combined') {
+                html += '<p><strong>✓ Single Combined Role: "Head of AI" or "AI Program Lead"</strong></p>';
+                html += '<p>Based on your company size and budget, start with one person handling both strategy and enablement.</p>';
+                html += '<ul>';
+                html += '<li>50% Strategic planning and governance</li>';
+                html += '<li>30% Enablement and office hours</li>';
+                html += '<li>20% Operational support</li>';
+                html += '</ul>';
+                html += '<p><strong>Salary Range:</strong> $120K - $160K depending on market and experience</p>';
+            } else if (rec.roleStructure === 'split') {
+                html += '<p><strong>✓ Two Separate Roles: AI Strategist + AI Enabler</strong></p>';
+                html += '<p>Your organization size and budget support having dedicated specialists.</p>';
+                html += '<ul>';
+                html += '<li><strong>AI Strategist:</strong> $140K - $180K - Focus on strategy, governance, executive communication</li>';
+                html += '<li><strong>AI Enabler:</strong> $90K - $130K - Focus on office hours, onboarding, knowledge sharing</li>';
+                html += '</ul>';
+            } else {
+                html += '<p><strong>✓ Phased Approach: Start Combined, Split Later</strong></p>';
+                html += '<p>Begin with one person, plan to add second role in 3-6 months.</p>';
+                html += '<ul>';
+                html += '<li><strong>Phase 1 (Months 1-3):</strong> Hire combined role</li>';
+                html += '<li><strong>Phase 2 (Months 4-6):</strong> Add enabler role as AI adoption grows</li>';
+                html += '</ul>';
+            }
+            html += '</div>';
+
+            // Hiring Strategy
+            html += '<div class="recommendation-card">';
+            html += '<h3>Hiring Strategy</h3>';
+            
+            if (rec.hiringStrategy === 'internal') {
+                html += '<p><strong>✓ Recommended: Internal Promotion</strong></p>';
+                html += '<p>You have internal candidates and need to move quickly. This is your best option.</p>';
+                html += '<ul>';
+                html += '<li><strong>Pros:</strong> Knows your stack, has credibility, faster ramp-up</li>';
+                html += '<li><strong>Timeline:</strong> 2-4 weeks to transition</li>';
+                html += '<li><strong>Action:</strong> Identify candidate, create transition plan, backfill their current role</li>';
+                html += '</ul>';
+            } else if (rec.hiringStrategy === 'external') {
+                html += '<p><strong>✓ Recommended: External Hire</strong></p>';
+                html += '<p>No strong internal candidates means you need fresh expertise.</p>';
+                html += '<ul>';
+                html += '<li><strong>Pros:</strong> Brings outside frameworks and best practices</li>';
+                html += '<li><strong>Timeline:</strong> 2-3 months to hire and onboard</li>';
+                html += '<li><strong>Action:</strong> Draft JD immediately, engage recruiter, prioritize industry experience</li>';
+                html += '</ul>';
+            } else {
+                html += '<p><strong>✓ Recommended: Hybrid Approach</strong></p>';
+                html += '<p>Promote someone internally for quick wins, hire externally for strategic role.</p>';
+                html += '<ul>';
+                html += '<li><strong>Internal person:</strong> Takes enabler/coach role (knows the people)</li>';
+                html += '<li><strong>External hire:</strong> Takes strategist role (brings frameworks)</li>';
+                html += '<li><strong>Timeline:</strong> Internal transition in 2-4 weeks, external hire in 2-3 months</li>';
+                html += '</ul>';
+            }
+            html += '</div>';
+
+            // Urgency indicator
+            const urgencyClass = rec.urgencyLevel === 'high' ? 'score-low' : 
+                                rec.urgencyLevel === 'medium' ? 'score-medium' : 'score-high';
+            const urgencyText = rec.urgencyLevel === 'high' ? 'HIGH URGENCY' : 
+                               rec.urgencyLevel === 'medium' ? 'MEDIUM URGENCY' : 'LOW URGENCY';
+            
+            html += '<div class="recommendation-card">';
+            html += `<h3>Urgency Assessment <span class="score-indicator ${urgencyClass}">${urgencyText}</span></h3>`;
+            html += `<p>Based on your ${formData.painPoints.length} pain points and ${formData.timeline} timeline.</p>`;
+            html += '</div>';
+
+            // Warnings
+            if (rec.warnings.length > 0) {
+                html += '<div class="alert">';
+                html += '<p><strong>⚠️ Key Considerations:</strong></p>';
+                rec.warnings.forEach(warning => {
+                    html += `<p>• ${warning}</p>`;
+                });
+                html += '</div>';
+            }
+
+            // Quick Wins
+            if (rec.quickWins.length > 0) {
+                html += '<div class="alert success">';
+                html += '<p><strong>🚀 Quick Wins (Start These Now):</strong></p>';
+                rec.quickWins.forEach(win => {
+                    html += `<p>✓ ${win}</p>`;
+                });
+                html += '</div>';
+            }
+
+            // Top Priorities
+            if (rec.keyPriorities.length > 0) {
+                html += '<div class="recommendation-card">';
+                html += '<h3>Your Top Priorities</h3>';
+                html += '<p>Focus on these based on your selected pain points:</p>';
+                html += '<ul>';
+                rec.keyPriorities.slice(0, 5).forEach(priority => {
+                    html += `<li>${priority}</li>`;
+                });
+                html += '</ul>';
+                html += '</div>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        function generateActionPlan() {
+            const container = document.getElementById('actionPlanContainer');
+            const rec = analyzeAndRecommend();
+            
+            let html = '<div class="summary-section">';
+            html += '<h3>Executive Summary</h3>';
+            html += `<p><strong>Company:</strong> ${formData.companyName}</p>`;
+            html += `<p><strong>Current State:</strong> ${formData.maturityLevel} maturity with ${formData.aiUsers} people using AI</p>`;
+            html += `<p><strong>Key Challenges:</strong> ${formData.painPoints.length} major pain points identified</p>`;
+            html += `<p><strong>Budget Allocated:</strong> ${formatBudget(formData.budget)}</p>`;
+            html += `<p><strong>Target Timeline:</strong> ${formatTimeline(formData.timeline)}</p>`;
+            html += '</div>';
+
+            // Implementation Timeline
+            html += '<div class="summary-section">';
+            html += '<h3>Implementation Timeline</h3>';
+            html += '<div class="timeline">';
+            
+            if (rec.hiringStrategy === 'internal') {
+                html += '<div class="timeline-item">';
+                html += '<h4>Week 1-2: Internal Transition</h4>';
+                html += '<p>• Identify and approach internal candidate<br>• Define role expectations and compensation adjustment<br>• Create transition plan for their current responsibilities</p>';
+                html += '</div>';
+                
+                html += '<div class="timeline-item">';
+                html += '<h4>Week 3-4: Setup Foundation</h4>';
+                html += '<p>• Form executive steering committee<br>• Conduct AI project audit<br>• Set up first office hours session<br>• Create shared knowledge repository</p>';
+                html += '</div>';
+            } else {
+                html += '<div class="timeline-item">';
+                html += '<h4>Month 1: Recruitment</h4>';
+                html += '<p>• Draft job description<br>• Post positions<br>• Begin candidate screening<br>• Conduct first round interviews</p>';
+                html += '</div>';
+                
+                html += '<div class="timeline-item">';
+                html += '<h4>Month 2: Hiring & Onboarding</h4>';
+                html += '<p>• Final interviews and offer<br>• Onboarding preparation<br>• Define initial OKRs<br>• Set up tools and access</p>';
+                html += '</div>';
+            }
+            
+            html += '<div class="timeline-item">';
+            html += '<h4>Month 2-3: Quick Wins</h4>';
+            html += '<p>• Launch office hours program<br>• Complete AI project mapping<br>• Identify 2-3 consolidation opportunities<br>• Run first cross-team showcase</p>';
+            html += '</div>';
+            
+            html += '<div class="timeline-item">';
+            html += '<h4>Month 4-6: Scale Foundation</h4>';
+            html += '<p>• Establish governance framework<br>• Document approved AI patterns<br>• Launch onboarding program<br>• Create measurement dashboard<br>• Complete first strategic planning cycle</p>';
+            html += '</div>';
+            
+            html += '</div></div>';
+
+            // First 30 Days
+            html += '<div class="summary-section">';
+            html += '<h3>First 30 Days Action Items</h3>';
+            html += '<ul>';
+            html += '<li><strong>Day 1-7:</strong> Executive sponsor kickoff meeting, announce initiative to company</li>';
+            html += '<li><strong>Day 8-14:</strong> Conduct stakeholder interviews, audit existing AI projects</li>';
+            html += '<li><strong>Day 15-21:</strong> Draft governance framework, set up knowledge repository</li>';
+            html += '<li><strong>Day 22-30:</strong> Launch first office hours, present findings to leadership</li>';
+            html += '</ul>';
+            html += '</div>';
+
+            // Success Metrics
+            html += '<div class="summary-section">';
+            html += '<h3>Key Success Metrics</h3>';
+            html += '<ul>';
+            html += '<li><strong>Month 3:</strong> 80%+ of AI projects registered in central system</li>';
+            html += '<li><strong>Month 6:</strong> 50%+ reduction in duplicated efforts</li>';
+            html += '<li><strong>Month 6:</strong> Office hours attendance >20 people/week</li>';
+            html += '<li><strong>Month 6:</strong> New hire AI onboarding time <1 day</li>';
+            html += '<li><strong>Month 12:</strong> 3-5 major AI initiatives delivered to production</li>';
+            html += '<li><strong>Month 12:</strong> Measurable ROI documentation for top projects</li>';
+            html += '</ul>';
+            html += '</div>';
+
+            // Resources Needed
+            html += '<div class="summary-section">';
+            html += '<h3>Resources & Budget Breakdown</h3>';
+            html += '<p><strong>Personnel:</strong></p>';
+            html += '<ul>';
+            if (rec.roleStructure === 'combined') {
+                html += '<li>1 Head of AI / AI Program Lead: $120K-160K</li>';
+            } else {
+                html += '<li>1 AI Strategist: $140K-180K</li>';
+                html += '<li>1 AI Enabler: $90K-130K</li>';
+            }
+            html += '</ul>';
+            html += '<p><strong>Tools & Infrastructure:</strong></p>';
+            html += '<ul>';
+            html += '<li>AI platforms (Anthropic, OpenAI, etc.): $10K-50K/year</li>';
+            html += '<li>Collaboration tools (Confluence, etc.): $5K/year</li>';
+            html += '<li>Monitoring & governance software: $10K-30K/year</li>';
+            html += '</ul>';
+            html += '<p><strong>Training & Development:</strong></p>';
+            html += '<ul>';
+            html += '<li>Team training programs: $20K-40K</li>';
+            html += '<li>Conference attendance: $5K-10K</li>';
+            html += '</ul>';
+            html += '</div>';
+
+            // Next Steps
+            html += '<div class="alert info">';
+            html += '<p><strong>🎯 Immediate Next Steps for ' + formData.userName + ':</strong></p>';
+            html += '<p>1. Schedule executive sponsor meeting to secure commitment<br>';
+            html += '2. ' + (rec.hiringStrategy === 'internal' ? 'Identify and approach internal candidate' : 'Draft job description and engage recruiter') + '<br>';
+            html += '3. Form AI steering committee with key stakeholders<br>';
+            html += '4. Allocate budget and set up initial tools<br>';
+            html += '5. Announce initiative to company</p>';
+            html += '</div>';
+
+            container.innerHTML = html;
+        }
+
+        function formatBudget(budget) {
+            const map = {
+                'under100k': 'Under $100K',
+                '100-250k': '$100K - $250K',
+                '250-500k': '$250K - $500K',
+                'over500k': 'Over $500K'
+            };
+            return map[budget];
+        }
+
+        function formatTimeline(timeline) {
+            const map = {
+                'immediate': 'Immediate (1-2 months)',
+                'quarter': 'This Quarter (3-4 months)',
+                'half': 'Next 6 months'
+            };
+            return map[timeline];
+        }
+
+        function downloadPlan() {
+            generateActionPlan();
+            
+            const planText = `
+AI CENTER OF EXCELLENCE - IMPLEMENTATION PLAN
+Company: ${formData.companyName}
+Prepared for: ${formData.userName}
+Generated: ${new Date().toLocaleDateString()}
+
+============================================
+EXECUTIVE SUMMARY
+============================================
+Current State: ${formData.maturityLevel} maturity
+AI Users: ${formData.aiUsers} people
+Pain Points: ${formData.painPoints.length} identified
+Budget: ${formatBudget(formData.budget)}
+Timeline: ${formatTimeline(formData.timeline)}
+
+============================================
+RECOMMENDATIONS
+============================================
+${JSON.stringify(analyzeAndRecommend(), null, 2)}
+
+============================================
+ACTION ITEMS
+============================================
+See full implementation plan in the wizard.
+
+This plan was generated by the AI CoE Implementation Wizard.
+For questions or support, refer back to the online tool.
+            `;
+            
+            const blob = new Blob([planText], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `AI-CoE-Plan-${formData.companyName.replace(/\s/g, '-')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function restartWizard() {
+            currentStep = 1;
+            showStep(1);
+            updateProgress();
+            
+            // Clear form
+            document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(input => {
+                input.value = '';
+            });
+            document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(input => {
+                input.checked = false;
+            });
+            document.querySelectorAll('.radio-option, .checkbox-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            window.scrollTo(0, 0);
+        }
+
+        // Auto-generate action plan when reaching step 7
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.target.classList.contains('active') && 
+                    mutation.target.dataset.step === '7' &&
+                    !document.getElementById('actionPlanContainer').innerHTML) {
+                    generateActionPlan();
+                }
+            });
+        });
+
+        document.querySelectorAll('.step').forEach(step => {
+            observer.observe(step, { attributes: true, attributeFilter: ['class'] });
+        });
+    </script>
+</body>
+</html>
